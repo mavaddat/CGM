@@ -4,9 +4,9 @@ using System.Linq;
 using codessentials.CGM.Commands;
 using codessentials.CGM.Export;
 using codessentials.CGM.Import;
-using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using Shouldly;
 
 namespace codessentials.CGM.Tests
 {
@@ -32,14 +32,14 @@ namespace codessentials.CGM.Tests
         [Test]
         public void Bool()
         {
-            Test(w => w.WriteBool(true), r => _reader.ReadBool().Should().Be(true));
-            Test(w => w.WriteBool(false), r => _reader.ReadBool().Should().Be(false));
+            Test(w => w.WriteBool(true), r => _reader.ReadBool().ShouldBe(true));
+            Test(w => w.WriteBool(false), r => _reader.ReadBool().ShouldBe(false));
         }
 
         [Test]
         public void FixedString()
         {
-            Test(w => w.WriteFixedString("test"), r => _reader.ReadFixedString().Should().Be("test"));
+            Test(w => w.WriteFixedString("test"), r => _reader.ReadFixedString().ShouldBe("test"));
         }
 
         [Test]
@@ -49,8 +49,8 @@ namespace codessentials.CGM.Tests
             Test(w => w.WriteFixedString(testString), r =>
             {
                 var actual = _reader.ReadFixedString();
-                actual.Length.Should().Be(testString.Length);
-                actual.Should().Be(testString);
+                actual.Length.ShouldBe(testString.Length);
+                actual.ShouldBe(testString);
             });
         }
 
@@ -60,15 +60,15 @@ namespace codessentials.CGM.Tests
         //    var testString = "".PadLeft(10000, 'a').PadLeft(20000, 'b').PadLeft(30000, 'c').PadLeft(40000, 'd').PadLeft(50000, 'e').PadLeft(60000, 'f'); 
         //    Test(w => w.WriteFixedString(testString), r => {
         //        var actual = _reader.ReadFixedString();
-        //        actual.Length.Should().Be(testString.Length);
-        //        actual.Should().Be(testString);
+        //        actual.Length.ShouldBe(testString.Length);
+        //        actual.ShouldBe(testString);
         //    });
         //}
 
         [Test]
         public void String()
         {
-            Test(w => w.WriteString("test"), r => _reader.ReadString().Should().Be("test"));
+            Test(w => w.WriteString("test"), r => _reader.ReadString().ShouldBe("test"));
         }
 
         [Test]
@@ -78,8 +78,8 @@ namespace codessentials.CGM.Tests
             Test(w => w.WriteString(testString), r =>
             {
                 var actual = _reader.ReadString();
-                actual.Length.Should().Be(testString.Length);
-                actual.Should().Be(testString);
+                actual.Length.ShouldBe(testString.Length);
+                actual.ShouldBe(testString);
             });
         }
 
@@ -89,77 +89,77 @@ namespace codessentials.CGM.Tests
         //    var testString = "".PadLeft(10000, 'a').PadLeft(20000, 'b').PadLeft(30000, 'c').PadLeft(40000, 'd').PadLeft(50000, 'e').PadLeft(60000, 'f'); 
         //    Test(w => w.WriteString(testString), r => {
         //        var actual = _reader.ReadString();
-        //        actual.Length.Should().Be(testString.Length);
-        //        actual.Should().Be(testString);
+        //        actual.Length.ShouldBe(testString.Length);
+        //        actual.ShouldBe(testString);
         //    });
         //}
 
         [Test]
         public void UInt1_1()
         {
-            Test(w => w.WriteUInt(1, 1), r => _reader.ReadUInt(1).Should().Be(1));
+            Test(w => w.WriteUInt(1, 1), r => _reader.ReadUInt(1).ShouldBe(1));
         }
 
         [Test]
         public void UInt1_0()
         {
-            Test(w => w.WriteUInt(0, 1), r => _reader.ReadUInt(1).Should().Be(0));
+            Test(w => w.WriteUInt(0, 1), r => _reader.ReadUInt(1).ShouldBe(0));
         }
 
         [Test]
         public void UInt2()
         {
-            Test(w => w.WriteUInt(2, 2), r => _reader.ReadUInt(2).Should().Be(2));
+            Test(w => w.WriteUInt(2, 2), r => _reader.ReadUInt(2).ShouldBe(2));
         }
 
         [Test]
         public void UInt2_1()
         {
-            Test(w => w.WriteUInt(1, 2), r => _reader.ReadUInt(2).Should().Be(1));
+            Test(w => w.WriteUInt(1, 2), r => _reader.ReadUInt(2).ShouldBe(1));
         }
 
         [Test]
         public void UInt4_14()
         {
-            Test(w => w.WriteUInt(14, 4), r => { _reader.ReadUInt(4).Should().Be(14); });
+            Test(w => w.WriteUInt(14, 4), r => { _reader.ReadUInt(4).ShouldBe(14); });
         }
 
         [Test]
         public void UInt4_13()
         {
-            Test(w => w.WriteUInt(13, 4), r => { _reader.ReadUInt(4).Should().Be(13); });
+            Test(w => w.WriteUInt(13, 4), r => { _reader.ReadUInt(4).ShouldBe(13); });
         }
 
         [Test]
         public void UInt4_5()
         {
-            Test(w => w.WriteUInt(5, 4), r => { _reader.ReadUInt(4).Should().Be(5); });
+            Test(w => w.WriteUInt(5, 4), r => { _reader.ReadUInt(4).ShouldBe(5); });
         }
 
         [Test]
         public void UInt8()
         {
-            Test(w => w.WriteUInt(55, 8), r => _reader.ReadUInt(8).Should().Be(55));
+            Test(w => w.WriteUInt(55, 8), r => _reader.ReadUInt(8).ShouldBe(55));
         }
 
         [Test]
         public void UInt16()
         {
-            Test(w => w.WriteUInt(55, 16), r => _reader.ReadUInt(16).Should().Be(55));
+            Test(w => w.WriteUInt(55, 16), r => _reader.ReadUInt(16).ShouldBe(55));
         }
 
         [Test]
         public void UInt24()
         {
-            Test(w => w.WriteUInt(55, 24), r => _reader.ReadUInt(24).Should().Be(55));
+            Test(w => w.WriteUInt(55, 24), r => _reader.ReadUInt(24).ShouldBe(55));
         }
 
         [Test]
         public void UInt32()
         {
-            Test(w => w.WriteUInt(55, 32), r => _reader.ReadUInt(32).Should().Be(55));
-            Test(w => w.WriteUInt(0, 32), r => _reader.ReadUInt(32).Should().Be(0));
-            Test(w => w.WriteUInt(int.MaxValue, 32), r => _reader.ReadUInt(32).Should().Be(int.MaxValue));
+            Test(w => w.WriteUInt(55, 32), r => _reader.ReadUInt(32).ShouldBe(55));
+            Test(w => w.WriteUInt(0, 32), r => _reader.ReadUInt(32).ShouldBe(0));
+            Test(w => w.WriteUInt(int.MaxValue, 32), r => _reader.ReadUInt(32).ShouldBe(int.MaxValue));
         }
 
         private void Test(Action<IBinaryWriter> writerAction, Action<IBinaryReader> readerAction)

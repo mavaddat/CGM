@@ -1,10 +1,7 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using NUnit.Framework;
+using Shouldly;
 
 namespace codessentials.CGM.Tests
 {
@@ -20,12 +17,12 @@ namespace codessentials.CGM.Tests
             {
                 if (name.EndsWith(".cgm", StringComparison.OrdinalIgnoreCase))
                 {
-                    BinaryCgmFile binaryFile = ReadBinaryFile(name, assembly);
+                    var binaryFile = ReadBinaryFile(name, assembly);
 
-                    Assert.AreEqual(0, binaryFile.Messages.Count(), "Messages: " + string.Join("\r\n", binaryFile.Messages.Select(m => m.ToString())));
+                    binaryFile.Messages.Count().ShouldBe(0, "Messages: " + string.Join("\r\n", binaryFile.Messages.Select(m => m.ToString())));
                 }
             }
         }
- 
+
     }
 }

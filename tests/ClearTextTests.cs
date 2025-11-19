@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Shouldly;
 
 namespace codessentials.CGM.Tests
 {
@@ -27,7 +28,7 @@ namespace codessentials.CGM.Tests
                         var actual = ConvertToClearText(binaryFile);
                         var expected = ReadExpectedTextContent(comparisionFile, assembly);
 
-                        Assert.AreEqual(0, binaryFile.Messages.Count());
+                        binaryFile.Messages.ShouldBeEmpty();
 
 
                         //StringAssert.AreEqualIgnoringCase(RemoveCompareExceptions(expected), RemoveCompareExceptions(actual), $"File {name} differs!");
@@ -50,7 +51,7 @@ namespace codessentials.CGM.Tests
                     var binaryFile = ReadBinaryFile(name, assembly);
                     var content = ConvertToClearText(binaryFile);
 
-                    Assert.IsNotEmpty(content, $"File {name} is could not be converted!");
+                    content.ShouldNotBeEmpty($"File {name} is could not be converted!");
                 }
             }
         }

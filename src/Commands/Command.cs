@@ -68,7 +68,7 @@ namespace codessentials.CGM.Commands
             return value.ToString("f4", CultureInfo.InvariantCulture);
         }
 
-        protected string WriteReal(double value)
+        protected static string WriteReal(double value)
         {
             return WriteDouble(value);
         }
@@ -77,21 +77,17 @@ namespace codessentials.CGM.Commands
         {
             if (_container.VDCType == VdcType.Type.Real)
                 return WriteDouble(value);
-            else
-                return WriteInt(Convert.ToInt32(value));
+
+            return WriteInt(Convert.ToInt32(value));
         }
 
         protected string WriteVC(VC value)
         {
-            switch (_container.DeviceViewportSpecificationMode)
+            return _container.DeviceViewportSpecificationMode switch
             {
-                case DeviceViewportSpecificationMode.Mode.MM:
-                case DeviceViewportSpecificationMode.Mode.PHYDEVCOORD:
-                    return WriteInt(value.ValueInt);
-                case DeviceViewportSpecificationMode.Mode.FRACTION:
-                default:
-                    return WriteReal(value.ValueReal);
-            }
+                DeviceViewportSpecificationMode.Mode.MM or DeviceViewportSpecificationMode.Mode.PHYDEVCOORD => WriteInt(value.ValueInt),
+                _ => WriteReal(value.ValueReal),
+            };
         }
 
         protected string WriteViewportPoint(ViewportPoint value)
@@ -99,12 +95,12 @@ namespace codessentials.CGM.Commands
             return WriteVC(value.FirstPoint) + " " + WriteVC(value.SecondPoint);
         }
 
-        protected string WritePoint(CgmPoint value)
+        protected static string WritePoint(CgmPoint value)
         {
             return WritePoint(value.X, value.Y);
         }
 
-        protected string WritePoint(double x, double y)
+        protected static string WritePoint(double x, double y)
         {
             var signCharY = "";
 
@@ -114,17 +110,17 @@ namespace codessentials.CGM.Commands
             return $"({WriteDouble(x)},{signCharY}{WriteDouble(y)})";
         }
 
-        protected string WriteBool(bool value)
+        protected static string WriteBool(bool value)
         {
             return value ? "on" : "off";
         }
 
-        protected string WriteBoolYesNo(bool value)
+        protected static string WriteBoolYesNo(bool value)
         {
             return value ? "yes" : "no";
         }
 
-        protected string WriteString(string value)
+        protected static string WriteString(string value)
         {
             // remove non-printable elements
             value = new string(value.Where(c => !char.IsControl(c) || c == 13 || c == 10 || c == 9).ToArray());
@@ -132,27 +128,27 @@ namespace codessentials.CGM.Commands
             return $"'{value}'";
         }
 
-        protected string WriteEnum(object value)
+        protected static string WriteEnum(object value)
         {
             return $"{value.ToString().ToLower()}";
         }
 
-        protected string WriteName(int value)
+        protected static string WriteName(int value)
         {
             return $"{value}";
         }
 
-        protected string WriteIndex(int value)
+        protected static string WriteIndex(int value)
         {
             return $"{value}";
         }
 
-        protected string WriteInt(int value)
+        protected static string WriteInt(int value)
         {
             return $"{value}";
         }
 
-        protected string WriteColor(Color color, ColourModel.Model model)
+        protected static string WriteColor(Color color, ColourModel.Model model)
         {
             return model switch
             {
@@ -246,7 +242,7 @@ namespace codessentials.CGM.Commands
             //}
         }
 
-        protected string WriteBitStream(byte[] value)
+        protected static string WriteBitStream(byte[] value)
         {
             var sb = new StringBuilder();
 

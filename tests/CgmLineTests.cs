@@ -1,5 +1,5 @@
 ﻿using codessentials.CGM.Classes;
-using FluentAssertions;
+using Shouldly;
 using NUnit.Framework;
 
 namespace codessentials.CGM.Tests
@@ -15,11 +15,11 @@ namespace codessentials.CGM.Tests
 
             var line = new CgmLine(a, b);
 
-            line.A.X.Should().Be(0);
-            line.A.Y.Should().Be(0);
+            line.A.X.ShouldBe(0);
+            line.A.Y.ShouldBe(0);
 
-            line.B.X.Should().Be(10);
-            line.B.Y.Should().Be(10);
+            line.B.X.ShouldBe(10);
+            line.B.Y.ShouldBe(10);
         }
 
         [Test]
@@ -30,11 +30,11 @@ namespace codessentials.CGM.Tests
 
             var line = new CgmLine(a, b);
 
-            line.A.X.Should().Be(0);
-            line.A.Y.Should().Be(10);
+            line.A.X.ShouldBe(0);
+            line.A.Y.ShouldBe(10);
 
-            line.B.X.Should().Be(10);
-            line.B.Y.Should().Be(0);
+            line.B.X.ShouldBe(10);
+            line.B.Y.ShouldBe(0);
         }
 
         [Test]
@@ -45,11 +45,11 @@ namespace codessentials.CGM.Tests
 
             var line = new CgmLine(a, b);
 
-            line.A.X.Should().Be(0);
-            line.A.Y.Should().Be(0);
+            line.A.X.ShouldBe(0);
+            line.A.Y.ShouldBe(0);
 
-            line.B.X.Should().Be(10);
-            line.B.Y.Should().Be(10);
+            line.B.X.ShouldBe(10);
+            line.B.Y.ShouldBe(10);
         }
 
         [Test]
@@ -60,11 +60,11 @@ namespace codessentials.CGM.Tests
 
             var line = new CgmLine(a, b);
 
-            line.A.X.Should().Be(10);
-            line.A.Y.Should().Be(0);
+            line.A.X.ShouldBe(10);
+            line.A.Y.ShouldBe(0);
 
-            line.B.X.Should().Be(10);
-            line.B.Y.Should().Be(10);
+            line.B.X.ShouldBe(10);
+            line.B.Y.ShouldBe(10);
         }
 
         [Test]
@@ -75,11 +75,11 @@ namespace codessentials.CGM.Tests
 
             var line = new CgmLine(a, b);
 
-            line.A.X.Should().Be(10);
-            line.A.Y.Should().Be(0);
+            line.A.X.ShouldBe(10);
+            line.A.Y.ShouldBe(0);
 
-            line.B.X.Should().Be(10);
-            line.B.Y.Should().Be(10);
+            line.B.X.ShouldBe(10);
+            line.B.Y.ShouldBe(10);
         }
     }
 }

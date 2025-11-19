@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using Shouldly;
 
 namespace codessentials.CGM.Tests
 {
@@ -13,7 +13,7 @@ namespace codessentials.CGM.Tests
             var binaryFile = ReadBinaryFile(fileName);
             var actualName = binaryFile.GetGraphicName();
 
-            Assert.AreEqual(expectedName, actualName);
+            actualName.ShouldBe(expectedName);
         }
 
         [Ignore("Not yet ready")]
@@ -24,7 +24,7 @@ namespace codessentials.CGM.Tests
             var actualItems = binaryFile.GetFigureItemTexts(true);
             actualItems.Sort();
 
-            actualItems.Should().Equal(expectedItems);
+            actualItems.ShouldBeEquivalentTo(expectedItems);
         }
     }
 }

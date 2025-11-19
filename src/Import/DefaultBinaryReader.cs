@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using codessentials.CGM.Classes;
 using codessentials.CGM.Commands;
 
@@ -446,26 +447,26 @@ namespace codessentials.CGM.Import
             }
         }
 
-        private int ReadInt16Direct(BinaryReader reader)
+        private static int ReadInt16Direct(BinaryReader reader)
         {
             return (reader.ReadByte() << 8) | reader.ReadByte();
         }
 
         protected string ReadString(int length)
         {
-            var c = new char[length];
             try
             {
+                var bytes = new byte[length];
                 for (var i = 0; i < length; i++)
                 {
-                    c[i] = (char)ReadByte();
+                    bytes[i] = ReadByte();
                 }
 
-                return new string(c, 0, length); //"ISO8859-1"
+                return Encoding.UTF8.GetString(bytes);
             }
             catch (Exception)
             {
-                return new string(c);
+                return new string(' ', length); // return empty spaces instead of garbled chars
             }
         }
 
@@ -791,7 +792,7 @@ namespace codessentials.CGM.Import
             return wholePart + (fractionPart / Two_Ex_16);
         }
 
-        private int SizeOfFixedPoint32()
+        private static int SizeOfFixedPoint32()
         {
             return 2 + 2;
         }
@@ -804,7 +805,7 @@ namespace codessentials.CGM.Import
             return wholePart + (fractionPart / Two_Ex_32);
         }
 
-        private int SizeOfFixedPoint64()
+        private static int SizeOfFixedPoint64()
         {
             return 4 + 4;
         }
@@ -829,7 +830,7 @@ namespace codessentials.CGM.Import
             return System.Convert.ToDouble((decimal)result);
         }
 
-        private int SizeOfFloatingPoint32()
+        private static int SizeOfFloatingPoint32()
         {
             return 2 * 2;
         }
@@ -845,7 +846,7 @@ namespace codessentials.CGM.Import
             return BitConverter.Int64BitsToDouble(bits);
         }
 
-        private int SizeOfFloatingPoint64()
+        private static int SizeOfFloatingPoint64()
         {
             return 2 * 4;
         }
@@ -1024,7 +1025,7 @@ namespace codessentials.CGM.Import
             };
         }
 
-        private int Scale(int r, int min, int max)
+        private static int Scale(int r, int min, int max)
         {
             return 255 * (r - min) / (max - min);
         }
@@ -1036,7 +1037,7 @@ namespace codessentials.CGM.Import
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        private int Clamp(int r, int min, int max)
+        private static int Clamp(int r, int min, int max)
         {
             return Math.Max(Math.Min(r, max), min);
         }

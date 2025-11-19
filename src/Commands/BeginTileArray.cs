@@ -1,5 +1,5 @@
-﻿using codessentials.CGM.Classes;
-using System.Text;
+﻿using System.Text;
+using codessentials.CGM.Classes;
 
 namespace codessentials.CGM.Commands
 {
@@ -99,24 +99,23 @@ namespace codessentials.CGM.Commands
             writer.WriteLine(";");
         }
 
-        private string GetLineDirection(int lineProgressionDirection)
+        private static string GetLineDirection(int lineProgressionDirection)
         {
             if (lineProgressionDirection == 1)
                 return "270";
-            else
-                return "90";
+
+            return "90";
         }
 
-        private string GetDirection(int cellPathDirection)
+        private static string GetDirection(int cellPathDirection)
         {
             if (cellPathDirection == 1)
                 return "90";
-            else if (cellPathDirection == 2)
+            if (cellPathDirection == 2)
                 return "180";
-            else if (cellPathDirection == 3)
+            if (cellPathDirection == 3)
                 return "270";
-            else
-                return "0";
+            return "0";
         }
 
         public override string ToString()

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using codessentials.CGM.Commands;
-using FluentAssertions;
 using NUnit.Framework;
+using Shouldly;
 
 namespace codessentials.CGM.Tests
 {
@@ -29,7 +29,7 @@ namespace codessentials.CGM.Tests
                     var newBinary = new BinaryCgmFile(stream);
                     var actual = ConvertToClearText(newBinary);
 
-                    actual.Should().Be(expected, "In file " + name);
+                    actual.ShouldBe(expected, "In file " + name);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace codessentials.CGM.Tests
             var newBinary = new BinaryCgmFile(stream);
             var actual = ConvertToClearText(newBinary);
 
-            actual.Should().Be(expected);
+            actual.ShouldBe(expected);
         }
 
         [TestCase("Any")]
@@ -70,7 +70,7 @@ namespace codessentials.CGM.Tests
             expected.AppendLine($" mfdesc '{data}';");
             expected.AppendLine("ENDMF;");
 
-            Assert.AreEqual(expected.ToString().Replace("\r\n", "\n"), actual);
+            actual.ShouldBe(expected.ToString().Replace("\r\n", "\n"));
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace codessentials.CGM.Tests
             //expected.AppendLine(" charcoding BASIC8BIT;");
             expected.AppendLine("ENDMF;");
 
-            Assert.AreEqual(expected.ToString().Replace("\r\n", "\n"), actual);
+            actual.ShouldBe(expected.ToString().Replace("\r\n", "\n"));
         }
     }
 }

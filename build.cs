@@ -1,8 +1,11 @@
-#tool "dotnet:?package=GitVersion.Tool&version=5.8.1"
-#tool "nuget:?package=NuGet.CommandLine&version=6.1.0"
-#tool "nuget:?package=dotnet-sonarscanner&version=5.5.3"
+﻿#:sdk Cake.Sdk@6.0.0
 
-#addin "nuget:?package=Cake.Sonar&version=1.1.30"
+#:package Cake.Sonar@5.0.0
+
+InstallTools(
+    "dotnet:?package=GitVersion.Tool&version=6.5.0",
+    "dotnet:?package=dotnet-sonarscanner&version=11.0.0"
+);
 
 var target = Argument("target", "Default");
 var nugetApiKey = Argument("nugetApiKey", EnvironmentVariable("nugetApiKey"));
@@ -12,7 +15,6 @@ var sonarLogin = Argument("sonarLogin", EnvironmentVariable("sonarLogin"));
 //////////////////////////////////////////////////////////////////////
 //    Build Variables
 /////////////////////////////////////////////////////////////////////
-var solution = "./codessentials.CGM.sln";
 var project = File("./src/codessentials.CGM.csproj").Path.MakeAbsolute(Context.Environment);
 var outputDir = Directory("./buildArtifacts/").Path.MakeAbsolute(Context.Environment);
 var packageOutputDir = Directory("./buildArtifacts/Package").Path.MakeAbsolute(Context.Environment);
@@ -57,7 +59,7 @@ Task("Clean")
 	CreateDirectory(outputDir);
 });
 
-GitVersion versionInfo = null;
+GitVersion? versionInfo = null;
 Task("Version")
 	.Description("Retrieves the current version from the git repository")
 	.Does(() => {
@@ -88,16 +90,19 @@ Task("Version")
 Task("Build")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Version")
-	.Does(() => {				
+	.Does(() => {
 
-		var settings = new DotNetBuildSettings {
+        if (versionInfo is null)
+            throw new InvalidOperationException("GitVersion information is not available.");
+
+        var settings = new DotNetBuildSettings {
 			Configuration = configuration,
 			OutputDirectory = outputDir		 
 		};	 		
 
 		settings.MSBuildSettings = new DotNetMSBuildSettings()
 		{
-			PackageVersion = versionInfo.NuGetVersionV2,
+			PackageVersion = versionInfo.SemVer,
 			AssemblyVersion = versionInfo.AssemblySemVer,
 			Version = versionInfo.AssemblySemVer,
 			InformationalVersion = versionInfo.InformationalVersion
@@ -132,7 +137,7 @@ Task("SonarBegin")
 			Key = sonarProjectKey,
 			Url = sonarUrl,
 			Organization = sonarOrganization,
-			Login = sonarLogin,
+			Token = sonarLogin,
 			UseCoreClr = true,
 			VsTestReportsPath = testResultsPath.ToString(),
 			OpenCoverReportsPath = codeCoverageResultFilePath.ToString()
@@ -143,7 +148,7 @@ Task("SonarEnd")
 	.WithCriteria(!isLocalBuild)
 	.Does(() => {
 		SonarEnd(new SonarEndSettings {
-			Login = sonarLogin
+            Token = sonarLogin
 		});
 	});
 
@@ -152,8 +157,11 @@ Task("Pack")
 	.IsDependentOn("Test")
 	.IsDependentOn("Version")
 	.Does(() => {
-		
-		var settings = new DotNetPackSettings
+
+        if (versionInfo is null)
+            throw new InvalidOperationException("GitVersion information is not available.");
+
+        var settings = new DotNetPackSettings
 		{			
 			Configuration = configuration,
 			OutputDirectory = outputDirNuget,
@@ -161,8 +169,8 @@ Task("Pack")
 		};
 
 		settings.MSBuildSettings = new DotNetMSBuildSettings() {
-				PackageVersion = versionInfo.NuGetVersionV2
-		}.WithProperty("SourceLinkCreate", "true");
+				PackageVersion = versionInfo.SemVer
+        }.WithProperty("SourceLinkCreate", "true");
 	 		 
 		DotNetPack(project.FullPath, settings);			
 	});
@@ -184,11 +192,15 @@ Task("Publish")
 			return;
 		}
 
-		// Push the package.
-		NuGetPush(packages, new NuGetPushSettings {
-			Source = nugetPublishFeed,
-			ApiKey = nugetApiKey
-		});	
+        foreach (var package in packages)
+        {
+            // Push the package.
+            DotNetNuGetPush(package, new DotNetNuGetPushSettings
+            {
+                Source = nugetPublishFeed,
+                ApiKey = nugetApiKey
+            });
+        }
 	});	
 
 Task("Default")

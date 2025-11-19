@@ -175,7 +175,7 @@ namespace codessentials.CGM.Classes
             return rect.Contains(pointWithinRange);
         }
 
-        private class RectanglePoints
+        private sealed class RectanglePoints
         {
             CgmLine _topLine;
             CgmLine _bottomLine;

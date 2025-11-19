@@ -606,14 +606,14 @@ namespace codessentials.CGM.Export
             };
         }
 
-        private int Scale(int r, int min, int max)
+        private static int Scale(int r, int min, int max)
         {
             // return 255 * (r - min) / (max - min);
 
             return (max + min) * (r + min) / 255;
         }
 
-        private int Clamp(int r, int min, int max)
+        private static int Clamp(int r, int min, int max)
         {
             return Math.Max(Math.Min(r, max), min);
         }
@@ -688,14 +688,16 @@ namespace codessentials.CGM.Export
         public void WriteFloatingPoint32(double data)
         {
             var bytes = BitConverter.GetBytes((float)data);
-            _bucket.AddRange(bytes.Reverse());
+            bytes.Reverse();
+            _bucket.AddRange(bytes);
         }
 
         private void WriteFloatingPoint64(double value)
         {
             var lng = BitConverter.DoubleToInt64Bits(value);
             var bytes = BitConverter.GetBytes(lng);
-            _bucket.AddRange(bytes.Reverse());
+            bytes.Reverse();
+            _bucket.AddRange(bytes);
         }
         #endregion
     }
