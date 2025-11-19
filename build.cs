@@ -140,8 +140,10 @@ Task("SonarBegin")
 			Token = sonarLogin,
 			UseCoreClr = true,
 			VsTestReportsPath = testResultsPath.ToString(),
-			OpenCoverReportsPath = codeCoverageResultFilePath.ToString()
-		});
+			OpenCoverReportsPath = codeCoverageResultFilePath.ToString(),
+            ArgumentCustomization = args => args.Append("/d:sonar.scanner.skipJreProvisioning=true")
+            .Append("/d:sonar.scanner.scanAll=false") // disable Multi-Language analysis
+        });
 	});
 
 Task("SonarEnd")
