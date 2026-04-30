@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 
 namespace codessentials.CGM.Tests
@@ -20,6 +21,18 @@ namespace codessentials.CGM.Tests
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
             return new BinaryCgmFile(stream, resourceName);
+        }
+
+        protected BinaryCgmFile ReadBinaryFileByFullResourceName(
+            string fullResourceName,
+            Assembly assembly)
+        {
+            using var stream = assembly.GetManifestResourceStream(fullResourceName);
+
+            return stream is null
+                ? throw new InvalidOperationException(
+                    $"Embedded resource not found: {fullResourceName}")
+                : new BinaryCgmFile(stream, fullResourceName);
         }
 
         protected byte[] GetResourceData(string resourceName)

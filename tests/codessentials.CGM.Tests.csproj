@@ -13,10 +13,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="4.5.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
 
@@ -42,6 +43,7 @@
     <EmbeddedResource Include="Files\BACGND07.CGM" />
     <EmbeddedResource Include="Files\col_disassembly.cgm" />
     <EmbeddedResource Include="Files\col_nav.cgm" />
+    <EmbeddedResource Include="Files\dmrl.dt" />
     <EmbeddedResource Include="Files\illustrations\ICN-S1000DBIKE-AAA-D000000-0-U8025-00502-A-04-1.CGM" />
     <EmbeddedResource Include="Files\illustrations\ICN-S1000DBIKE-AAA-D000000-0-U8025-00536-A-04-1.CGM" />
     <EmbeddedResource Include="Files\illustrations\ICN-S1000DBIKE-AAA-D000000-0-U8025-00536-B-04-1.CGM" />
@@ -89,5 +91,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\codessentials.CGM.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\Wiring Diagrams\**">
+      <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Files\dmrl.dt" />
   </ItemGroup>
 </Project>
