@@ -6,6 +6,7 @@
     <Copyright>Copyright © 2026</Copyright>
     <ProjectGuid>{22322112-C9AD-4325-B0FB-975B13ED8EFF}</ProjectGuid>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

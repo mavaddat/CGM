@@ -1,4 +1,5 @@
-﻿using codessentials.CGM.Tests.Services;
+﻿using codessentials.CGM.Elements;
+using codessentials.CGM.Tests.Services;
 
 namespace codessentials.CGM.Tests.Models;
 
@@ -7,7 +8,7 @@ public static class LinkDecisionEngine
 {
     public static LinkDecision Decide(
         AtaCode authoritativeAta,
-        LinkUriContext link)
+        LinkUriElement link)
     {
         var linkAta = AtaExtractor.FromLinkUri(link);
 

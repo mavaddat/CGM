@@ -89,8 +89,7 @@ class RealCgmLinkPruningTests : CgmTest
                                 LinkDecisionEngine.Decide(
                                     authoritativeAta, link);
 
-                            var path =
-                                link.SdrStrings.FirstOrDefault() ?? "<no path>";
+                            var path = link.Destination;
 
                             if (decision == LinkDecision.Remove)
                             {
@@ -120,9 +119,8 @@ class RealCgmLinkPruningTests : CgmTest
 
                         // ✅ Invariant: no surviving link may point to a different ATA
                         aps.LinkUris.Any(l =>
-                            l.SdrStrings.Any(s =>
-                                AtaExtractor.FromPath(s)?.Value != null &&
-                                AtaExtractor.FromPath(s)!.Value != authoritativeAta.Value))
+                            AtaExtractor.FromPath(l.Destination)?.Value != null &&
+                                AtaExtractor.FromPath(l.Destination)!.Value != authoritativeAta.Value)
                         .ShouldBeFalse(
                             $"Cross-ATA link survived in APS {aps.ApsId}");
                     }
@@ -145,10 +143,100 @@ class RealCgmLinkPruningTests : CgmTest
                             .ToList()
                         ?? [];
 
-                    aps.LinkUris.Add(new LinkUriContext(strings));
+                    aps.LinkUris.AddRange(attr.GetLinkUris());
                 }
             }
         }
     }
+    [Test]
+    public void Real_Cgms_Are_Pruned_By_Own_Ata()
+    {
+        var assembly = GetType().Assembly;
 
+        var cgms = ApplicationStructureLinkEnumerationTests
+            .GetTestCgms(assembly, take: 1);
+
+        foreach (var resourceName in cgms)
+        {
+            TestContext.WriteLine($"Processing CGM: {resourceName}");
+
+            // ✅ Authoritative ATA from the CGM path itself
+            var authoritativeAta =
+                AtaExtractor.FromPath(resourceName);
+
+            authoritativeAta.ShouldNotBeNull(
+                $"Cannot derive ATA from CGM path {resourceName}");
+
+            var binaryFile =
+                ReadBinaryFileByFullResourceName(resourceName, assembly);
+
+            ApplicationStructureContext? aps = null;
+            var depth = 0;
+
+            foreach (var cmd in binaryFile.Commands)
+            {
+                if (cmd is BeginApplicationStructure bas)
+                {
+                    aps = new ApplicationStructureContext(bas.Id);
+                    depth++;
+                }
+                else if (cmd is EndApplicationStructure)
+                {
+                    if (aps != null && aps.LinkUris.Count > 0)
+                    {
+                        TestContext.WriteLine($"  APS {aps.ApsId}");
+
+                        foreach (var link in aps.LinkUris.ToList())
+                        {
+                            var targetAta = AtaExtractor.FromPath(link.Destination);
+
+                            if (targetAta != null &&
+                                targetAta.AtaChapter != authoritativeAta.AtaChapter)
+                            {
+                                TestContext.WriteLine(
+                                    $"    REMOVED: {link.Destination} " +
+                                    $"(ATA {targetAta.Value} ≠ {authoritativeAta.Value})");
+
+                                aps.LinkUris.Remove(link);
+                            }
+                            else
+                            {
+                                TestContext.WriteLine(
+                                    $"    KEPT:    {link.Destination}");
+                            }
+                        }
+
+                        // ✅ Now we *expect* pruning to have happened
+                        aps.LinkUris.Any(l =>
+                        {
+                            var ata = AtaExtractor.FromPath(l.Destination);
+                            return ata != null &&
+                                   ata.AtaChapter != authoritativeAta.AtaChapter;
+                        })
+                            .ShouldBeFalse($"Cross-ATA link survived in APS {aps.ApsId}");
+                    }
+
+                    aps = null;
+                    depth--;
+                }
+                else if (depth > 0 && aps != null &&
+                         cmd is ApplicationStructureAttribute attr &&
+                         attr.AttributeType.Equals(
+                             "linkuri",
+                             StringComparison.OrdinalIgnoreCase))
+                {
+                    var uris = attr.GetLinkUris();
+
+                    if (uris.Count == 0)
+                    {
+                        TestContext.WriteLine(
+                            $"    LINKURI in APS {aps.ApsId} produced no uris");
+                    }
+
+                    aps.LinkUris.AddRange(uris);
+
+                }
+            }
+        }
+    }
 }

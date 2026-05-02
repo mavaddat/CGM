@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using codessentials.CGM.Elements;
 using codessentials.CGM.Tests.Models;
 
 namespace codessentials.CGM.Tests.Services;
@@ -26,14 +27,11 @@ public static partial class AtaExtractor
     /// <summary>
     /// Extract ATA from linkuri CGM path (e.g. 27-04-01.AAD).
     /// </summary>
-    public static AtaCode? FromLinkUri(LinkUriContext link)
+    public static AtaCode? FromLinkUri(LinkUriElement link)
     {
-        foreach (var s in link.SdrStrings)
-        {
-            var match = AtaPattern().Match(s);
-            if (match.Success)
-                return new AtaCode(match.Value);
-        }
+        var match = AtaPattern().Match(link.Destination);
+        if (match.Success)
+            return new AtaCode(match.Value);
 
         return null;
     }
@@ -49,20 +47,13 @@ public static partial class AtaExtractor
         if (string.IsNullOrWhiteSpace(path))
             return null;
 
-        var match = AtaFromPathPattern().Match(path);
+        var match = AtaPattern().Match(path);
 
         return match.Success
             ? new AtaCode(match.Groups["ata"].Value)
             : null;
     }
 
-    // Matches folder names like "21-20-05.AAE"
-    // Captures ATA chapter "21-20"
-    [GeneratedRegex(
-        @"(?:^|[\\/])(?<ata>\d{2}-\d{2}-\d{2})\.[A-Z]{3}(?:[\\/])",
-        RegexOptions.Compiled)]
-    private static partial Regex AtaFromPathPattern();
-
-    [GeneratedRegex(@"\b\d{2}-\d{2}-\d{2}\b", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\b(?<ata>\d{2}-\d{2}-\d{2})\b", RegexOptions.Compiled)]
     private static partial Regex AtaPattern();
 }

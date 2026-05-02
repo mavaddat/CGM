@@ -20,6 +20,7 @@
     <LangVersion>latest</LangVersion>
     <ProjectGuid>{56E1F6C9-610E-4FF4-BBCD-43EBD535C4AF}</ProjectGuid>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />

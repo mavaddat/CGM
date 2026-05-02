@@ -8,6 +8,8 @@ public sealed partial record AtaCode
 
     public string Value { get; }
 
+    public string AtaChapter => AtaChapterPattern().Match(Value).Value;
+
     public AtaCode(string value)
     {
         if (!AtaPattern().IsMatch(value))
@@ -20,6 +22,9 @@ public sealed partial record AtaCode
     public override string ToString() => Value;
     [GeneratedRegex(@"\b\d{2}-\d{2}-\d{2}\b", RegexOptions.Compiled)]
     private static partial Regex AtaPattern();
+
+    [GeneratedRegex(@"^\d{2}-\d{2}\b", RegexOptions.Compiled)]
+    private static partial Regex AtaChapterPattern();
 }
 public sealed record CgmAtaContext(
     string CgmFileName,

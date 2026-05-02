@@ -10,7 +10,7 @@ namespace codessentials.CGM.Export
     {
         private readonly StreamWriter _writer;
         private readonly List<Message> _messages = new List<Message>();
-        private Command _currentCommand;
+        private Command? _currentCommand;
         private bool _isDisposed;
 
         private const string LINE_FEED = "\n";
@@ -21,7 +21,12 @@ namespace codessentials.CGM.Export
 
         public DefaultClearTextWriter(Stream stream)
         {
-            _writer = new StreamWriter(stream, CodePagesEncodingProvider.Instance.GetEncoding(1252));
+            _writer = new StreamWriter(
+                stream,
+                CodePagesEncodingProvider.Instance.GetEncoding(1252),
+                bufferSize: 1024,
+                leaveOpen: true);
+
         }
 
         public void Dispose()

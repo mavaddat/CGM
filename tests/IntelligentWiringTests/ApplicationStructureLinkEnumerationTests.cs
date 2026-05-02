@@ -82,23 +82,19 @@ partial class ApplicationStructureLinkEnumerationTests : CgmTest
                         $"  LINKURI found in APS '{currentAps.Id}'");
 
                     // Inspect Structured Data Record
-                    var sdr = apsAttr.Data;
-                    if (sdr == null || sdr.Members == null)
-                    {
-                        TestContext.WriteLine("    (No SDR data)");
-                        continue;
-                    }
+                    var uris = apsAttr.GetLinkUris();
 
-                    foreach (var member in sdr.Members)
+                    if (uris.Count == 0)
                     {
-                        // String entries correspond to <sdr_string>
-                        if (member.Type == StructuredDataRecord.StructuredDataType.S)
+                        TestContext.WriteLine("    (No LINKURI data)");
+                    }
+                    else
+                    {
+                        foreach (var uri in uris)
                         {
-                            foreach (var value in member.Data)
-                            {
-                                TestContext.WriteLine(
-                                    $"    SDR String: '{value}'");
-                            }
+                            TestContext.WriteLine(
+                                $"    LINKURI: dest='{uri.Destination}', " +
+                                $"title='{uri.Title}', behavior='{uri.Behavior}'");
                         }
                     }
                 }
@@ -197,8 +193,11 @@ partial class ApplicationStructureLinkEnumerationTests : CgmTest
                                 $"APS {aps.ApsId} would be removed (empty)");
                         }
                         aps.LinkUris.Any(l =>
-                        l.SdrStrings.Any(s =>
-                        s.Contains("31-") || s.Contains("34-")))
+                        {
+                            var ata = AtaExtractor.FromPath(l.Destination);
+                            return ata != null &&
+                                   (ata.Value.StartsWith("31-") || ata.Value.StartsWith("34-"));
+                        })
                             .ShouldBeFalse("Cross‑ATA links should be removed");
                     }
 
@@ -219,15 +218,7 @@ partial class ApplicationStructureLinkEnumerationTests : CgmTest
                             "linkuri",
                             StringComparison.OrdinalIgnoreCase))
                     {
-                        var sdrStrings =
-                            apsAttr.Data?.Members?
-                                .Where(m => m.Type == StructuredDataRecord.StructuredDataType.S)
-                                .SelectMany(m => m.Data)
-                                .OfType<string>()
-                                .ToList()
-                            ?? [];
-
-                        aps.LinkUris.Add(new LinkUriContext(sdrStrings));
+                        aps.LinkUris.AddRange(apsAttr.GetLinkUris());
                     }
                     else
                     {
@@ -329,18 +320,14 @@ partial class ApplicationStructureLinkEnumerationTests : CgmTest
                 if (cmd is ApplicationStructureAttribute attr &&
                     attr.AttributeType.Equals("linkuri", StringComparison.OrdinalIgnoreCase))
                 {
-                    var sdrStrings =
-                        attr.Data?.Members?
-                            .Where(m => m.Type == StructuredDataRecord.StructuredDataType.S)
-                            .SelectMany(m => m.Data)
-                            .OfType<string>()
-                        ?? [];
+                    foreach(var link in attr.GetLinkUris())
+                    {
+                        var ata = AtaExtractor.FromLinkUri(link);
+                        if (ata != null)
+                            ataValues.Add(ata.Value);
+                    }
 
-                    var link = new LinkUriContext(sdrStrings);
-                    var ata = AtaExtractor.FromLinkUri(link);
 
-                    if (ata != null)
-                        ataValues.Add(ata.Value);
                 }
             }
         }
@@ -393,7 +380,7 @@ partial class ApplicationStructureLinkEnumerationTests : CgmTest
                 else if (depth > 0 && aps != null && cmd is ApplicationStructureAttribute attr &&
                          attr.AttributeType.Equals("linkuri", StringComparison.OrdinalIgnoreCase))
                 {
-                    aps.LinkUris.Add(new LinkUriContext([]));
+                    aps.LinkUris.AddRange(attr.GetLinkUris());
                 }
             }
         }
